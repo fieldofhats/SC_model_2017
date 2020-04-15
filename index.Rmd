@@ -1,6 +1,7 @@
 ---
 title: "2017_results"
-html_document
+output: 
+  html_document
 ---
 
 <br><br><br><br><br><br/>

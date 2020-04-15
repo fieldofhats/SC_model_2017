@@ -1,0 +1,27 @@
+name: "2017 SC results"
+output_dir: "docs"
+navbar:
+  title: "2017 SC Model Results"
+  left:
+  - text: "Home"
+    href: index.html
+  - text: "AmericanBadger"
+    href: AmericanBadger2017.html
+  - text: "AmericanBlackBear"
+    href: AmericanBlackBear2017.html
+  - text: "AmericanMarten"
+    href: AmericanMarten2017.html
+  - text: "Bobcat"
+    href: Bobcat2017.html
+  - text: "Coyote"
+    href: Coyote2017.html
+  - text: "LongTailedWeasel"
+    href: LongTailedWeasel2017.html
+  - text: "WhiteTailedJackrabbit"
+    href: WhiteTailedJackrabbit2017.html
+  - text: "ResultsSummary"
+    href: ResultsSummary.html
+output:
+  html_document:
+    theme: cosmo
+

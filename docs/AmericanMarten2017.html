@@ -1,0 +1,2135 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+
+
+<title>SC Model Results Summary</title>
+
+<script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/bootstrap.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<link href="site_libs/highlightjs-9.12.0/default.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+<script src="site_libs/kePrint-0.0.1/kePrint.js"></script>
+
+<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css">
+  pre:not([class]) {
+    background-color: white;
+  }
+</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+<style type="text/css">
+h1 {
+  font-size: 34px;
+}
+h1.title {
+  font-size: 38px;
+}
+h2 {
+  font-size: 30px;
+}
+h3 {
+  font-size: 24px;
+}
+h4 {
+  font-size: 18px;
+}
+h5 {
+  font-size: 16px;
+}
+h6 {
+  font-size: 12px;
+}
+.table th:not([align]) {
+  text-align: left;
+}
+</style>
+
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+code {
+  color: inherit;
+  background-color: rgba(0, 0, 0, 0.04);
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+</style>
+
+
+<style type="text/css">
+/* padding for bootstrap navbar */
+body {
+  padding-top: 51px;
+  padding-bottom: 40px;
+}
+/* offset scroll position for anchor links (for fixed navbar)  */
+.section h1 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h2 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h3 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h4 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h5 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h6 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #ffffff;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script>
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark it active
+  menuAnchor.parent().addClass('active');
+
+  // if it's got a parent navbar menu mark it active as well
+  menuAnchor.closest('li.dropdown').addClass('active');
+});
+</script>
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "&#xe258;";
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+  background-color: transparent;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">2017 SC Model Results</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="index.html">Home</a>
+</li>
+<li>
+  <a href="AmericanBadger2017.html">AmericanBadger</a>
+</li>
+<li>
+  <a href="AmericanBlackBear2017.html">AmericanBlackBear</a>
+</li>
+<li>
+  <a href="AmericanMarten2017.html">AmericanMarten</a>
+</li>
+<li>
+  <a href="Bobcat2017.html">Bobcat</a>
+</li>
+<li>
+  <a href="Coyote2017.html">Coyote</a>
+</li>
+<li>
+  <a href="LongTailedWeasel2017.html">LongTailedWeasel</a>
+</li>
+<li>
+  <a href="WhiteTailedJackrabbit2017.html">WhiteTailedJackrabbit</a>
+</li>
+<li>
+  <a href="ResultsSummary.html">ResultsSummary</a>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div class="fluid-row" id="header">
+
+
+
+<h1 class="title toc-ignore">SC Model Results Summary</h1>
+
+</div>
+
+
+<p><br><br><br><br/></p>
+<div id="year-2017" class="section level4">
+<h4>Year:        2017</h4>
+</div>
+<div id="species-americanmarten" class="section level4">
+<h4>Species:      AmericanMarten</h4>
+</div>
+<div id="study-site-humphreys-basin" class="section level4">
+<h4>Study Site:    Humphreys Basin</h4>
+<p><br><br/></p>
+</div>
+<div id="metadata-summary" class="section level4">
+<h4>Metadata Summary:</h4>
+<table class="table table-striped" style="width: auto !important; ">
+<thead>
+<tr>
+<th style="text-align:center;">
+n_sites
+</th>
+<th style="text-align:center;">
+N_detections
+</th>
+<th style="text-align:center;">
+rep_period
+</th>
+<th style="text-align:center;">
+model_agg_M
+</th>
+<th style="text-align:center;">
+iterations
+</th>
+<th style="text-align:center;">
+burnin
+</th>
+<th style="text-align:center;">
+state_buffer
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center;">
+31
+</td>
+<td style="text-align:center;">
+42
+</td>
+<td style="text-align:center;">
+7 days
+</td>
+<td style="text-align:center;">
+250
+</td>
+<td style="text-align:center;">
+80000
+</td>
+<td style="text-align:center;">
+20000
+</td>
+<td style="text-align:center;">
+2.5
+</td>
+</tr>
+</tbody>
+</table>
+<p><br><br/></p>
+</div>
+<div id="waic" class="section level4">
+<h4>WAIC</h4>
+Models by WAIC:
+<table class="table table-striped" style="width: auto !important; ">
+<thead>
+<tr>
+<th style="text-align:left;">
+model
+</th>
+<th style="text-align:left;">
+description
+</th>
+<th style="text-align:right;">
+WAIC
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+sc.fm2.1
+</td>
+<td style="text-align:left;">
+snow
+</td>
+<td style="text-align:right;">
+294.8411
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+sc.fm3
+</td>
+<td style="text-align:left;">
+lure + snow
+</td>
+<td style="text-align:right;">
+295.4257
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+sc.fm4
+</td>
+<td style="text-align:left;">
+lure + snow + temp
+</td>
+<td style="text-align:right;">
+297.4111
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+sc.fm2
+</td>
+<td style="text-align:left;">
+lure
+</td>
+<td style="text-align:right;">
+297.4325
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+sc.fm1
+</td>
+<td style="text-align:left;">
+dot model
+</td>
+<td style="text-align:right;">
+298.1381
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+sc.fm5
+</td>
+<td style="text-align:left;">
+lure + snow + temp + temp * snow
+</td>
+<td style="text-align:right;">
+298.5183
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+sc.fm2.2
+</td>
+<td style="text-align:left;">
+temp
+</td>
+<td style="text-align:right;">
+300.0459
+</td>
+</tr>
+</tbody>
+</table>
+<p><br><br/></p>
+</div>
+<div id="reversible-jump-mcmc" class="section level4">
+<h4>Reversible Jump MCMC:</h4>
+sc.fm6 model: (reverse jump) lure + snow + temp + temp * snow
+<table class="table table-striped" style="width: auto !important; ">
+<thead>
+<tr>
+<th style="text-align:left;">
+cov
+</th>
+<th style="text-align:right;">
+indicator_mean
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+psi.ind
+</td>
+<td style="text-align:right;">
+0.17282
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+beta.ind[1]
+</td>
+<td style="text-align:right;">
+0.03923
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+beta.ind[2]
+</td>
+<td style="text-align:right;">
+0.00377
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+beta.ind[3]
+</td>
+<td style="text-align:right;">
+0.00040
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+beta.ind[4]
+</td>
+<td style="text-align:right;">
+0.00000
+</td>
+</tr>
+</tbody>
+</table>
+sc.fm6.1 model: (reverse jump - unconstraint) lure + snow + temp + temp * snow
+<table class="table table-striped" style="width: auto !important; ">
+<thead>
+<tr>
+<th style="text-align:left;">
+cov
+</th>
+<th style="text-align:right;">
+indicator_mean
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+psi.ind
+</td>
+<td style="text-align:right;">
+0.17483
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+beta.ind[1]
+</td>
+<td style="text-align:right;">
+0.03728
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+beta.ind[2]
+</td>
+<td style="text-align:right;">
+0.00398
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+beta.ind[4]
+</td>
+<td style="text-align:right;">
+0.00060
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+beta.ind[3]
+</td>
+<td style="text-align:right;">
+0.00043
+</td>
+</tr>
+</tbody>
+</table>
+sc.fm6.2 model: (reverse jump) lure + snow + temp
+<table class="table table-striped" style="width: auto !important; ">
+<thead>
+<tr>
+<th style="text-align:left;">
+cov
+</th>
+<th style="text-align:right;">
+indicator_mean
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+psi.ind
+</td>
+<td style="text-align:right;">
+0.20882
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+beta.ind[1]
+</td>
+<td style="text-align:right;">
+0.04990
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+beta.ind[2]
+</td>
+<td style="text-align:right;">
+0.00520
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+beta.ind[3]
+</td>
+<td style="text-align:right;">
+0.00068
+</td>
+</tr>
+</tbody>
+</table>
+<br><br/> <br><br/>
+<div>
+
+</div>
+<div id="model-summaries" class="section level3">
+<h3>Model summaries:</h3>
+</div>
+<div id="sc.fm1-summary" class="section level3">
+<h3>sc.fm1    summary:</h3>
+<p>dot model</p>
+</div>
+<div id="section" class="section level2 tabset">
+<h2></h2>
+<div id="summary-table" class="section level3">
+<h3>summary table</h3>
+<pre><code>## Warning: Identical densities found along different segments of the distribution, choosing rightmost.</code></pre>
+<table class="table table-striped" style="width: auto !important; ">
+<thead>
+<tr>
+<th style="text-align:left;">
+param
+</th>
+<th style="text-align:right;">
+n_effective
+</th>
+<th style="text-align:right;">
+mean
+</th>
+<th style="text-align:right;">
+mode
+</th>
+<th style="text-align:right;">
+hdi_89pct_lower
+</th>
+<th style="text-align:right;">
+hdi_89pct_upper
+</th>
+<th style="text-align:right;">
+bayes_P
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+N
+</td>
+<td style="text-align:right;">
+684
+</td>
+<td style="text-align:right;">
+31.122
+</td>
+<td style="text-align:right;">
+16.965
+</td>
+<td style="text-align:right;">
+10.00
+</td>
+<td style="text-align:right;">
+54.00
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+D
+</td>
+<td style="text-align:right;">
+684
+</td>
+<td style="text-align:right;">
+18.807
+</td>
+<td style="text-align:right;">
+10.252
+</td>
+<td style="text-align:right;">
+4.83
+</td>
+<td style="text-align:right;">
+31.42
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+sigma
+</td>
+<td style="text-align:right;">
+2351
+</td>
+<td style="text-align:right;">
+0.795
+</td>
+<td style="text-align:right;">
+0.806
+</td>
+<td style="text-align:right;">
+0.58
+</td>
+<td style="text-align:right;">
+1.00
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+lam0
+</td>
+<td style="text-align:right;">
+2002
+</td>
+<td style="text-align:right;">
+0.115
+</td>
+<td style="text-align:right;">
+0.093
+</td>
+<td style="text-align:right;">
+0.03
+</td>
+<td style="text-align:right;">
+0.19
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="n" class="section level3">
+<h3>N</h3>
+<p><img src="AmericanMarten2017_files/figure-html/unnamed-chunk-7-1.png" width="672" /></p>
+</div>
+<div id="d" class="section level3">
+<h3>D</h3>
+<p><img src="AmericanMarten2017_files/figure-html/unnamed-chunk-8-1.png" width="672" /></p>
+</div>
+<div id="sigma" class="section level3">
+<h3>sigma</h3>
+<p><img src="AmericanMarten2017_files/figure-html/unnamed-chunk-9-1.png" width="672" /></p>
+</div>
+<div id="lam0" class="section level3">
+<h3>lam0</h3>
+<p><img src="AmericanMarten2017_files/figure-html/unnamed-chunk-10-1.png" width="672" /></p>
+</div>
+</div>
+<div id="section-1" class="section level1 unnumbered">
+<h1></h1>
+</div>
+<br><br><br><br><br>
+<div>
+
+
+
+
+
+<div id="sc.fm2-summary" class="section level3">
+<h3>sc.fm2    summary:</h3>
+<p>lure</p>
+</div>
+<div id="section-2" class="section level2 tabset">
+<h2></h2>
+<div id="summary-table-1" class="section level3">
+<h3>summary table</h3>
+<pre><code>## Warning: Identical densities found along different segments of the distribution, choosing rightmost.
+
+## Warning: Identical densities found along different segments of the distribution, choosing rightmost.</code></pre>
+<table class="table table-striped" style="width: auto !important; ">
+<thead>
+<tr>
+<th style="text-align:left;">
+param
+</th>
+<th style="text-align:right;">
+n_effective
+</th>
+<th style="text-align:right;">
+mean
+</th>
+<th style="text-align:right;">
+mode
+</th>
+<th style="text-align:right;">
+hdi_89pct_lower
+</th>
+<th style="text-align:right;">
+hdi_89pct_upper
+</th>
+<th style="text-align:right;">
+bayes_P
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+N
+</td>
+<td style="text-align:right;">
+297
+</td>
+<td style="text-align:right;">
+47.844
+</td>
+<td style="text-align:right;">
+26.428
+</td>
+<td style="text-align:right;">
+13.00
+</td>
+<td style="text-align:right;">
+87.00
+</td>
+<td style="text-align:right;">
+0.00000
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+D
+</td>
+<td style="text-align:right;">
+297
+</td>
+<td style="text-align:right;">
+28.912
+</td>
+<td style="text-align:right;">
+15.971
+</td>
+<td style="text-align:right;">
+7.86
+</td>
+<td style="text-align:right;">
+52.57
+</td>
+<td style="text-align:right;">
+0.00000
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+sigma
+</td>
+<td style="text-align:right;">
+2753
+</td>
+<td style="text-align:right;">
+0.797
+</td>
+<td style="text-align:right;">
+0.798
+</td>
+<td style="text-align:right;">
+0.59
+</td>
+<td style="text-align:right;">
+1.00
+</td>
+<td style="text-align:right;">
+0.00000
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+beta0.lam0
+</td>
+<td style="text-align:right;">
+757
+</td>
+<td style="text-align:right;">
+-3.006
+</td>
+<td style="text-align:right;">
+-2.918
+</td>
+<td style="text-align:right;">
+-3.93
+</td>
+<td style="text-align:right;">
+-2.09
+</td>
+<td style="text-align:right;">
+0.00000
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+beta.lam0[1]
+</td>
+<td style="text-align:right;">
+16253
+</td>
+<td style="text-align:right;">
+-0.912
+</td>
+<td style="text-align:right;">
+-0.789
+</td>
+<td style="text-align:right;">
+-1.51
+</td>
+<td style="text-align:right;">
+-0.28
+</td>
+<td style="text-align:right;">
+0.02892
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="n-1" class="section level3">
+<h3>N</h3>
+<p><img src="AmericanMarten2017_files/figure-html/unnamed-chunk-13-1.png" width="672" /></p>
+</div>
+<div id="d-1" class="section level3">
+<h3>D</h3>
+<p><img src="AmericanMarten2017_files/figure-html/unnamed-chunk-14-1.png" width="672" /></p>
+</div>
+<div id="sigma-1" class="section level3">
+<h3>sigma</h3>
+<p><img src="AmericanMarten2017_files/figure-html/unnamed-chunk-15-1.png" width="672" /></p>
+</div>
+<div id="beta0.lam0" class="section level3">
+<h3>beta0.lam0</h3>
+<p><img src="AmericanMarten2017_files/figure-html/unnamed-chunk-16-1.png" width="672" /></p>
+</div>
+<div id="beta.lam01" class="section level3">
+<h3>beta.lam0[1]</h3>
+<p><img src="AmericanMarten2017_files/figure-html/unnamed-chunk-17-1.png" width="672" /></p>
+</div>
+</div>
+</div>
+<div id="section-3" class="section level1 unnumbered">
+<h1></h1>
+</div>
+<br><br><br><br><br>
+<div>
+
+
+
+
+
+<div id="sc.fm2.1-summary" class="section level3">
+<h3>sc.fm2.1    summary:</h3>
+<p>snow</p>
+</div>
+<div id="section-4" class="section level2 tabset">
+<h2></h2>
+<div id="summary-table-2" class="section level3">
+<h3>summary table</h3>
+<pre><code>## Warning: Identical densities found along different segments of the distribution, choosing rightmost.
+
+## Warning: Identical densities found along different segments of the distribution, choosing rightmost.</code></pre>
+<table class="table table-striped" style="width: auto !important; ">
+<thead>
+<tr>
+<th style="text-align:left;">
+param
+</th>
+<th style="text-align:right;">
+n_effective
+</th>
+<th style="text-align:right;">
+mean
+</th>
+<th style="text-align:right;">
+mode
+</th>
+<th style="text-align:right;">
+hdi_89pct_lower
+</th>
+<th style="text-align:right;">
+hdi_89pct_upper
+</th>
+<th style="text-align:right;">
+bayes_P
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+N
+</td>
+<td style="text-align:right;">
+374
+</td>
+<td style="text-align:right;">
+38.694
+</td>
+<td style="text-align:right;">
+20.973
+</td>
+<td style="text-align:right;">
+11.00
+</td>
+<td style="text-align:right;">
+69.00
+</td>
+<td style="text-align:right;">
+0.00000
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+D
+</td>
+<td style="text-align:right;">
+374
+</td>
+<td style="text-align:right;">
+23.383
+</td>
+<td style="text-align:right;">
+12.674
+</td>
+<td style="text-align:right;">
+6.04
+</td>
+<td style="text-align:right;">
+41.09
+</td>
+<td style="text-align:right;">
+0.00000
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+sigma
+</td>
+<td style="text-align:right;">
+2148
+</td>
+<td style="text-align:right;">
+0.789
+</td>
+<td style="text-align:right;">
+0.800
+</td>
+<td style="text-align:right;">
+0.59
+</td>
+<td style="text-align:right;">
+1.00
+</td>
+<td style="text-align:right;">
+0.00000
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+beta0.lam0
+</td>
+<td style="text-align:right;">
+995
+</td>
+<td style="text-align:right;">
+-2.491
+</td>
+<td style="text-align:right;">
+-2.453
+</td>
+<td style="text-align:right;">
+-3.30
+</td>
+<td style="text-align:right;">
+-1.65
+</td>
+<td style="text-align:right;">
+0.00000
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+beta.lam0[1]
+</td>
+<td style="text-align:right;">
+38800
+</td>
+<td style="text-align:right;">
+0.329
+</td>
+<td style="text-align:right;">
+0.328
+</td>
+<td style="text-align:right;">
+0.09
+</td>
+<td style="text-align:right;">
+0.57
+</td>
+<td style="text-align:right;">
+0.09062
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="n-2" class="section level3">
+<h3>N</h3>
+<p><img src="AmericanMarten2017_files/figure-html/unnamed-chunk-20-1.png" width="672" /></p>
+</div>
+<div id="d-2" class="section level3">
+<h3>D</h3>
+<p><img src="AmericanMarten2017_files/figure-html/unnamed-chunk-21-1.png" width="672" /></p>
+</div>
+<div id="sigma-2" class="section level3">
+<h3>sigma</h3>
+<p><img src="AmericanMarten2017_files/figure-html/unnamed-chunk-22-1.png" width="672" /></p>
+</div>
+<div id="beta0.lam0-1" class="section level3">
+<h3>beta0.lam0</h3>
+<p><img src="AmericanMarten2017_files/figure-html/unnamed-chunk-23-1.png" width="672" /></p>
+</div>
+<div id="beta.lam01-1" class="section level3">
+<h3>beta.lam0[1]</h3>
+<p><img src="AmericanMarten2017_files/figure-html/unnamed-chunk-24-1.png" width="672" /></p>
+</div>
+</div>
+</div>
+<div id="section-5" class="section level1 unnumbered">
+<h1></h1>
+</div>
+<br><br><br><br><br>
+<div>
+
+
+
+
+
+<div id="sc.fm2.2-summary" class="section level3">
+<h3>sc.fm2.2    summary:</h3>
+<p>temp</p>
+</div>
+<div id="section-6" class="section level2 tabset">
+<h2></h2>
+<div id="summary-table-3" class="section level3">
+<h3>summary table</h3>
+<pre><code>## Warning: Identical densities found along different segments of the distribution, choosing rightmost.
+
+## Warning: Identical densities found along different segments of the distribution, choosing rightmost.</code></pre>
+<table class="table table-striped" style="width: auto !important; ">
+<thead>
+<tr>
+<th style="text-align:left;">
+param
+</th>
+<th style="text-align:right;">
+n_effective
+</th>
+<th style="text-align:right;">
+mean
+</th>
+<th style="text-align:right;">
+mode
+</th>
+<th style="text-align:right;">
+hdi_89pct_lower
+</th>
+<th style="text-align:right;">
+hdi_89pct_upper
+</th>
+<th style="text-align:right;">
+bayes_P
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+N
+</td>
+<td style="text-align:right;">
+288
+</td>
+<td style="text-align:right;">
+41.166
+</td>
+<td style="text-align:right;">
+21.764
+</td>
+<td style="text-align:right;">
+10.00
+</td>
+<td style="text-align:right;">
+75.00
+</td>
+<td style="text-align:right;">
+0.00000
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+D
+</td>
+<td style="text-align:right;">
+288
+</td>
+<td style="text-align:right;">
+24.877
+</td>
+<td style="text-align:right;">
+13.152
+</td>
+<td style="text-align:right;">
+6.04
+</td>
+<td style="text-align:right;">
+45.32
+</td>
+<td style="text-align:right;">
+0.00000
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+sigma
+</td>
+<td style="text-align:right;">
+2101
+</td>
+<td style="text-align:right;">
+0.794
+</td>
+<td style="text-align:right;">
+0.785
+</td>
+<td style="text-align:right;">
+0.59
+</td>
+<td style="text-align:right;">
+1.00
+</td>
+<td style="text-align:right;">
+0.00000
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+beta0.lam0
+</td>
+<td style="text-align:right;">
+816
+</td>
+<td style="text-align:right;">
+-2.525
+</td>
+<td style="text-align:right;">
+-2.415
+</td>
+<td style="text-align:right;">
+-3.39
+</td>
+<td style="text-align:right;">
+-1.67
+</td>
+<td style="text-align:right;">
+0.00000
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+beta.lam0[1]
+</td>
+<td style="text-align:right;">
+23925
+</td>
+<td style="text-align:right;">
+-0.063
+</td>
+<td style="text-align:right;">
+-0.061
+</td>
+<td style="text-align:right;">
+-0.32
+</td>
+<td style="text-align:right;">
+0.19
+</td>
+<td style="text-align:right;">
+0.93805
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="n-3" class="section level3">
+<h3>N</h3>
+<p><img src="AmericanMarten2017_files/figure-html/unnamed-chunk-27-1.png" width="672" /></p>
+</div>
+<div id="d-3" class="section level3">
+<h3>D</h3>
+<p><img src="AmericanMarten2017_files/figure-html/unnamed-chunk-28-1.png" width="672" /></p>
+</div>
+<div id="sigma-3" class="section level3">
+<h3>sigma</h3>
+<p><img src="AmericanMarten2017_files/figure-html/unnamed-chunk-29-1.png" width="672" /></p>
+</div>
+<div id="beta0.lam0-2" class="section level3">
+<h3>beta0.lam0</h3>
+<p><img src="AmericanMarten2017_files/figure-html/unnamed-chunk-30-1.png" width="672" /></p>
+</div>
+<div id="beta.lam01-2" class="section level3">
+<h3>beta.lam0[1]</h3>
+<p><img src="AmericanMarten2017_files/figure-html/unnamed-chunk-31-1.png" width="672" /></p>
+</div>
+</div>
+</div>
+<div id="section-7" class="section level1 unnumbered">
+<h1></h1>
+</div>
+<br><br><br><br><br>
+<div>
+
+
+
+
+
+<div id="sc.fm3-summary" class="section level3">
+<h3>sc.fm3    summary:</h3>
+<p>lure + snow</p>
+</div>
+<div id="section-8" class="section level2 tabset">
+<h2></h2>
+<div id="summary-table-4" class="section level3">
+<h3>summary table</h3>
+<pre><code>## Warning: Identical densities found along different segments of the distribution, choosing rightmost.
+
+## Warning: Identical densities found along different segments of the distribution, choosing rightmost.</code></pre>
+<table class="table table-striped" style="width: auto !important; ">
+<thead>
+<tr>
+<th style="text-align:left;">
+param
+</th>
+<th style="text-align:right;">
+n_effective
+</th>
+<th style="text-align:right;">
+mean
+</th>
+<th style="text-align:right;">
+mode
+</th>
+<th style="text-align:right;">
+hdi_89pct_lower
+</th>
+<th style="text-align:right;">
+hdi_89pct_upper
+</th>
+<th style="text-align:right;">
+bayes_P
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+N
+</td>
+<td style="text-align:right;">
+232
+</td>
+<td style="text-align:right;">
+55.458
+</td>
+<td style="text-align:right;">
+25.836
+</td>
+<td style="text-align:right;">
+11.00
+</td>
+<td style="text-align:right;">
+106.00
+</td>
+<td style="text-align:right;">
+0.00000
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+D
+</td>
+<td style="text-align:right;">
+232
+</td>
+<td style="text-align:right;">
+33.514
+</td>
+<td style="text-align:right;">
+15.613
+</td>
+<td style="text-align:right;">
+6.65
+</td>
+<td style="text-align:right;">
+64.06
+</td>
+<td style="text-align:right;">
+0.00000
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+sigma
+</td>
+<td style="text-align:right;">
+1905
+</td>
+<td style="text-align:right;">
+0.782
+</td>
+<td style="text-align:right;">
+0.772
+</td>
+<td style="text-align:right;">
+0.57
+</td>
+<td style="text-align:right;">
+0.99
+</td>
+<td style="text-align:right;">
+0.00000
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+beta0.lam0
+</td>
+<td style="text-align:right;">
+551
+</td>
+<td style="text-align:right;">
+-3.042
+</td>
+<td style="text-align:right;">
+-2.857
+</td>
+<td style="text-align:right;">
+-4.03
+</td>
+<td style="text-align:right;">
+-2.06
+</td>
+<td style="text-align:right;">
+0.00000
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+beta.lam0[1]
+</td>
+<td style="text-align:right;">
+13160
+</td>
+<td style="text-align:right;">
+-0.819
+</td>
+<td style="text-align:right;">
+-0.744
+</td>
+<td style="text-align:right;">
+-1.37
+</td>
+<td style="text-align:right;">
+-0.23
+</td>
+<td style="text-align:right;">
+0.03886
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+beta.lam0[2]
+</td>
+<td style="text-align:right;">
+42955
+</td>
+<td style="text-align:right;">
+0.281
+</td>
+<td style="text-align:right;">
+0.268
+</td>
+<td style="text-align:right;">
+0.05
+</td>
+<td style="text-align:right;">
+0.52
+</td>
+<td style="text-align:right;">
+0.17706
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="n-4" class="section level3">
+<h3>N</h3>
+<p><img src="AmericanMarten2017_files/figure-html/unnamed-chunk-34-1.png" width="672" /></p>
+</div>
+<div id="d-4" class="section level3">
+<h3>D</h3>
+<p><img src="AmericanMarten2017_files/figure-html/unnamed-chunk-35-1.png" width="672" /></p>
+</div>
+<div id="sigma-4" class="section level3">
+<h3>sigma</h3>
+<p><img src="AmericanMarten2017_files/figure-html/unnamed-chunk-36-1.png" width="672" /></p>
+</div>
+<div id="beta0.lam0-3" class="section level3">
+<h3>beta0.lam0</h3>
+<p><img src="AmericanMarten2017_files/figure-html/unnamed-chunk-37-1.png" width="672" /></p>
+</div>
+<div id="beta.lam01-3" class="section level3">
+<h3>beta.lam0[1]</h3>
+<p><img src="AmericanMarten2017_files/figure-html/unnamed-chunk-38-1.png" width="672" /></p>
+</div>
+<div id="beta.lam02" class="section level3">
+<h3>beta.lam0[2]</h3>
+<p><img src="AmericanMarten2017_files/figure-html/unnamed-chunk-39-1.png" width="672" /></p>
+</div>
+</div>
+</div>
+<div id="section-9" class="section level1 unnumbered">
+<h1></h1>
+</div>
+<br><br><br><br><br>
+<div>
+
+
+
+
+
+<div id="sc.fm4-summary" class="section level3">
+<h3>sc.fm4    summary:</h3>
+<p>lure + snow + temp</p>
+</div>
+<div id="section-10" class="section level2 tabset">
+<h2></h2>
+<div id="summary-table-5" class="section level3">
+<h3>summary table</h3>
+<table class="table table-striped" style="width: auto !important; ">
+<thead>
+<tr>
+<th style="text-align:left;">
+param
+</th>
+<th style="text-align:right;">
+n_effective
+</th>
+<th style="text-align:right;">
+mean
+</th>
+<th style="text-align:right;">
+mode
+</th>
+<th style="text-align:right;">
+hdi_89pct_lower
+</th>
+<th style="text-align:right;">
+hdi_89pct_upper
+</th>
+<th style="text-align:right;">
+bayes_P
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+N
+</td>
+<td style="text-align:right;">
+280
+</td>
+<td style="text-align:right;">
+52.747
+</td>
+<td style="text-align:right;">
+26.777
+</td>
+<td style="text-align:right;">
+10.00
+</td>
+<td style="text-align:right;">
+101.00
+</td>
+<td style="text-align:right;">
+0.00000
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+D
+</td>
+<td style="text-align:right;">
+280
+</td>
+<td style="text-align:right;">
+31.875
+</td>
+<td style="text-align:right;">
+16.182
+</td>
+<td style="text-align:right;">
+6.04
+</td>
+<td style="text-align:right;">
+61.03
+</td>
+<td style="text-align:right;">
+0.00000
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+sigma
+</td>
+<td style="text-align:right;">
+2956
+</td>
+<td style="text-align:right;">
+0.782
+</td>
+<td style="text-align:right;">
+0.799
+</td>
+<td style="text-align:right;">
+0.58
+</td>
+<td style="text-align:right;">
+0.99
+</td>
+<td style="text-align:right;">
+0.00000
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+beta0.lam0
+</td>
+<td style="text-align:right;">
+734
+</td>
+<td style="text-align:right;">
+-3.045
+</td>
+<td style="text-align:right;">
+-2.962
+</td>
+<td style="text-align:right;">
+-4.04
+</td>
+<td style="text-align:right;">
+-2.03
+</td>
+<td style="text-align:right;">
+0.00000
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+beta.lam0[1]
+</td>
+<td style="text-align:right;">
+12404
+</td>
+<td style="text-align:right;">
+-0.911
+</td>
+<td style="text-align:right;">
+-0.806
+</td>
+<td style="text-align:right;">
+-1.54
+</td>
+<td style="text-align:right;">
+-0.28
+</td>
+<td style="text-align:right;">
+0.03470
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+beta.lam0[2]
+</td>
+<td style="text-align:right;">
+39232
+</td>
+<td style="text-align:right;">
+0.265
+</td>
+<td style="text-align:right;">
+0.278
+</td>
+<td style="text-align:right;">
+0.02
+</td>
+<td style="text-align:right;">
+0.51
+</td>
+<td style="text-align:right;">
+0.22539
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+beta.lam0[3]
+</td>
+<td style="text-align:right;">
+42338
+</td>
+<td style="text-align:right;">
+-0.134
+</td>
+<td style="text-align:right;">
+-0.110
+</td>
+<td style="text-align:right;">
+-0.44
+</td>
+<td style="text-align:right;">
+0.17
+</td>
+<td style="text-align:right;">
+0.79659
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="n-5" class="section level3">
+<h3>N</h3>
+<p><img src="AmericanMarten2017_files/figure-html/unnamed-chunk-42-1.png" width="672" /></p>
+</div>
+<div id="d-5" class="section level3">
+<h3>D</h3>
+<p><img src="AmericanMarten2017_files/figure-html/unnamed-chunk-43-1.png" width="672" /></p>
+</div>
+<div id="sigma-5" class="section level3">
+<h3>sigma</h3>
+<p><img src="AmericanMarten2017_files/figure-html/unnamed-chunk-44-1.png" width="672" /></p>
+</div>
+<div id="beta0.lam0-4" class="section level3">
+<h3>beta0.lam0</h3>
+<p><img src="AmericanMarten2017_files/figure-html/unnamed-chunk-45-1.png" width="672" /></p>
+</div>
+<div id="beta.lam01-4" class="section level3">
+<h3>beta.lam0[1]</h3>
+<p><img src="AmericanMarten2017_files/figure-html/unnamed-chunk-46-1.png" width="672" /></p>
+</div>
+<div id="beta.lam02-1" class="section level3">
+<h3>beta.lam0[2]</h3>
+<p><img src="AmericanMarten2017_files/figure-html/unnamed-chunk-47-1.png" width="672" /></p>
+</div>
+<div id="beta.lam03" class="section level3">
+<h3>beta.lam0[3]</h3>
+<p><img src="AmericanMarten2017_files/figure-html/unnamed-chunk-48-1.png" width="672" /></p>
+</div>
+</div>
+</div>
+<div id="section-11" class="section level1 unnumbered">
+<h1></h1>
+</div>
+<br><br><br><br><br>
+<div>
+
+
+
+
+
+<div id="sc.fm5-summary" class="section level3">
+<h3>sc.fm5    summary:</h3>
+<p>lure + snow + temp + temp * snow</p>
+</div>
+<div id="section-12" class="section level2 tabset">
+<h2></h2>
+<div id="summary-table-6" class="section level3">
+<h3>summary table</h3>
+<pre><code>## Warning: Identical densities found along different segments of the distribution, choosing rightmost.</code></pre>
+<table class="table table-striped" style="width: auto !important; ">
+<thead>
+<tr>
+<th style="text-align:left;">
+param
+</th>
+<th style="text-align:right;">
+n_effective
+</th>
+<th style="text-align:right;">
+mean
+</th>
+<th style="text-align:right;">
+mode
+</th>
+<th style="text-align:right;">
+hdi_89pct_lower
+</th>
+<th style="text-align:right;">
+hdi_89pct_upper
+</th>
+<th style="text-align:right;">
+bayes_P
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+N
+</td>
+<td style="text-align:right;">
+373
+</td>
+<td style="text-align:right;">
+46.377
+</td>
+<td style="text-align:right;">
+24.664
+</td>
+<td style="text-align:right;">
+11.00
+</td>
+<td style="text-align:right;">
+86.00
+</td>
+<td style="text-align:right;">
+0.00000
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+D
+</td>
+<td style="text-align:right;">
+373
+</td>
+<td style="text-align:right;">
+28.026
+</td>
+<td style="text-align:right;">
+14.904
+</td>
+<td style="text-align:right;">
+6.65
+</td>
+<td style="text-align:right;">
+51.97
+</td>
+<td style="text-align:right;">
+0.00000
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+sigma
+</td>
+<td style="text-align:right;">
+2655
+</td>
+<td style="text-align:right;">
+0.788
+</td>
+<td style="text-align:right;">
+0.795
+</td>
+<td style="text-align:right;">
+0.59
+</td>
+<td style="text-align:right;">
+0.99
+</td>
+<td style="text-align:right;">
+0.00000
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+beta0.lam0
+</td>
+<td style="text-align:right;">
+833
+</td>
+<td style="text-align:right;">
+-3.021
+</td>
+<td style="text-align:right;">
+-2.912
+</td>
+<td style="text-align:right;">
+-3.98
+</td>
+<td style="text-align:right;">
+-2.05
+</td>
+<td style="text-align:right;">
+0.00000
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+beta.lam0[1]
+</td>
+<td style="text-align:right;">
+12082
+</td>
+<td style="text-align:right;">
+-0.990
+</td>
+<td style="text-align:right;">
+-0.894
+</td>
+<td style="text-align:right;">
+-1.64
+</td>
+<td style="text-align:right;">
+-0.31
+</td>
+<td style="text-align:right;">
+0.02722
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+beta.lam0[2]
+</td>
+<td style="text-align:right;">
+30438
+</td>
+<td style="text-align:right;">
+0.234
+</td>
+<td style="text-align:right;">
+0.243
+</td>
+<td style="text-align:right;">
+-0.02
+</td>
+<td style="text-align:right;">
+0.49
+</td>
+<td style="text-align:right;">
+0.33571
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+beta.lam0[3]
+</td>
+<td style="text-align:right;">
+25658
+</td>
+<td style="text-align:right;">
+-0.217
+</td>
+<td style="text-align:right;">
+-0.192
+</td>
+<td style="text-align:right;">
+-0.55
+</td>
+<td style="text-align:right;">
+0.13
+</td>
+<td style="text-align:right;">
+0.62193
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+beta.lam0[4]
+</td>
+<td style="text-align:right;">
+28033
+</td>
+<td style="text-align:right;">
+-0.217
+</td>
+<td style="text-align:right;">
+-0.218
+</td>
+<td style="text-align:right;">
+-0.63
+</td>
+<td style="text-align:right;">
+0.19
+</td>
+<td style="text-align:right;">
+0.70377
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="n-6" class="section level3">
+<h3>N</h3>
+<p><img src="AmericanMarten2017_files/figure-html/unnamed-chunk-51-1.png" width="672" /></p>
+</div>
+<div id="d-6" class="section level3">
+<h3>D</h3>
+<p><img src="AmericanMarten2017_files/figure-html/unnamed-chunk-52-1.png" width="672" /></p>
+</div>
+<div id="sigma-6" class="section level3">
+<h3>sigma</h3>
+<p><img src="AmericanMarten2017_files/figure-html/unnamed-chunk-53-1.png" width="672" /></p>
+</div>
+<div id="beta0.lam0-5" class="section level3">
+<h3>beta0.lam0</h3>
+<p><img src="AmericanMarten2017_files/figure-html/unnamed-chunk-54-1.png" width="672" /></p>
+</div>
+<div id="beta.lam01-5" class="section level3">
+<h3>beta.lam0[1]</h3>
+<p><img src="AmericanMarten2017_files/figure-html/unnamed-chunk-55-1.png" width="672" /></p>
+</div>
+<div id="beta.lam02-2" class="section level3">
+<h3>beta.lam0[2]</h3>
+<p><img src="AmericanMarten2017_files/figure-html/unnamed-chunk-56-1.png" width="672" /></p>
+</div>
+<div id="beta.lam03-1" class="section level3">
+<h3>beta.lam0[3]</h3>
+<p><img src="AmericanMarten2017_files/figure-html/unnamed-chunk-57-1.png" width="672" /></p>
+</div>
+<div id="beta.lam04" class="section level3">
+<h3>beta.lam0[4]</h3>
+<p><img src="AmericanMarten2017_files/figure-html/unnamed-chunk-58-1.png" width="672" /></p>
+</div>
+</div>
+</div>
+<div id="section-13" class="section level1 unnumbered">
+<h1></h1>
+</div>
+</div>
+
+
+
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.header').parent('thead').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open')
+  });
+});
+</script>
+
+<!-- code folding -->
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

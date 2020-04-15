@@ -1,0 +1,17 @@
+---
+title: "2017_results"
+html_document
+---
+
+<br><br><br><br><br><br/>
+
+
+[Back to SC Models](https://fieldofhats.github.io/SC_Intro_summary/ )
+
+### 2017 results notes:
+
+#### see model selection info under species tabs
+
+
+
+

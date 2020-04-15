@@ -1,0 +1,1190 @@
+---
+title: "SC Model Results Summary"
+output: 
+  html_document:
+params:
+  model.results: "C:/Hatfield/scripts/R/Projects/Meso/occupancy/OccEstimatesbyYear/data/out/SC_results_files_2017/SC_fm_results_2017_Coyote_20200411.Rdata"
+  model.year: "2017"
+  model.species: "Coyote"
+  model.meta: "C:/Hatfield/scripts/R/Projects/Meso/occupancy/OccEstimatesbyYear/data/out/SC_results_files_2017/metadata/SC_model_meta_2017.Rdata"
+---
+
+```{r, include=F}
+## will probably have to do one file per study season, tricky to generalize across years..
+## 
+
+  # html_document:
+  #   keep_md: TRUE
+
+library('mcmcplots')
+library('coda')
+library('ggmcmc')
+library('tidyverse')
+library(bayestestR)
+library(knitr)
+library(kableExtra)
+library(gridExtra)
+library(logspline)
+#library(nimble)
+
+catch.p_map<-function(x){
+  tryCatch({
+   round(p_map(x),5)
+}, warning = function(w) {
+    ""
+}, error = function(e) {
+    "err"
+})
+}
+
+catch.map_estimate<-function(x){
+  tryCatch({
+   round(map_estimate(x),3)
+}, warning = function(w) {
+    ""
+}, error = function(e) {
+    "err"
+})
+}
+# Mode <- function(x) {
+#   ux <- unique(x)
+#   ux[which.max(tabulate(match(x, ux)))]
+# }
+# 
+# 
+# Modes <- function(x) {
+#     ux <- unique(x)
+#     tab <- tabulate(match(x, ux))
+#     ux[tab == max(tab)]
+# }
+
+model.results<-readRDS(params$model.results)
+ #model.results <- params$model.results
+
+#model.dat<-params$model.results
+# getwd()
+meta<- readRDS(params$model.meta)
+#meta<-readRDS("../../data/out/SC_model_meta_2017.Rdata")
+# names(meta)
+
+models <- c(unlist(meta$inputModels))
+descriptions<- c(unlist(meta$models))
+n<-sum(c(unlist(meta$all.y.long[names(meta$all.y.long) %in% params$model.species])))
+M <- meta$M
+n.iter<-meta$n.iter
+n.burn<-meta$n.burn
+state.buffer<-meta$buffer
+nSites<-meta$nSites
+meta$mean.sd
+names(model.results)<-models
+
+meta.summary<-tibble(n_sites = nSites, N_detections = n, rep_period = '7 days', model_agg_M = M, iterations = n.iter, burnin = n.burn, state_buffer = state.buffer)
+
+
+if(params$model.year == '2016'){
+  model.site <- 'SN east side cells'
+}else if(params$model.year == '2017'){
+  model.site <- 'Humphreys Basin'
+}else if(params$model.year == '2018'){
+   model.site <- 'Mono creek'
+}else if(params$model.year == '2019'){
+  model.site <- 'Ritter Range'
+}else{
+  model.site <- '*****'
+}
+
+```
+<br><br><br><br/>
+
+#### Year: &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; `r params$model.year`
+#### Species:  &nbsp;&nbsp;&nbsp;&nbsp;  `r params$model.species`
+#### Study Site:  &nbsp;&nbsp;  `r model.site`
+
+
+
+
+<br><br/>
+
+#### Metadata Summary:
+```{r, echo = F}
+## look at the metadata
+kable(meta.summary,align = 'c') %>%
+  kable_styling(bootstrap_options = "striped", full_width = F, position = "left")
+
+
+
+```
+
+<br><br/>
+
+#### WAIC
+Models by WAIC:
+```{r, echo = F}
+### first look at the models by waic:
+
+models.waic<-c(unlist(lapply(model.results, function(x) x$WAIC)))
+waic.table<-tibble(model = models, description = descriptions, WAIC = models.waic) %>% 
+  filter(!grepl('reverse', description)) %>% 
+  arrange(WAIC)
+
+kable(waic.table) %>%
+  kable_styling(bootstrap_options = "striped", full_width = F, position = "left")
+
+```
+
+<br><br/>
+
+#### Reversible Jump MCMC:
+```{r, echo = F, results='asis'}
+
+# rev.models<-model.results[grepl('fm9', names(model.results)) | grepl('fm10', names(model.results))]
+rev.models<-model.results[grepl('reverse', descriptions) ]
+rev.names<-names(rev.models)
+
+rev.ind.list<-lapply(rev.models, function(x) x$samples[,grepl('ind', colnames(x$samples))])
+rev.ind.means<-lapply(rev.ind.list, function(x) apply(x,2,mean))
+
+tables<-as.list(rep(NA,3))
+for(i in 1: length(rev.ind.means)){
+  label<-names(rev.ind.means[i])
+  model<-descriptions[[label]]
+  sum.temp<-tibble(cov = names(rev.ind.means[[i]]), indicator_mean = round(rev.ind.means[[i]],5)) %>% 
+    arrange(-indicator_mean)
+  cat(label,'    model:',model,'\n')
+  temp.tab<-kable(sum.temp) %>%
+    kable_styling(bootstrap_options = "striped", full_width = F, position = "left")
+  print(temp.tab)
+}
+
+```
+
+<br><br/>
+<br><br/>
+<div>
+
+### Model summaries:
+
+```{r, include = F}
+#############################################################################################################################
+## model sc.fm1
+plot.model<-models[[1]]
+plot.dat<-model.results[[plot.model]]$samples[,c('N', 'D', 'sigma', 'lam0') ]
+plot.mcmc<-as.mcmc(plot.dat)
+plot.gg<-ggs(plot.mcmc)
+
+```
+
+
+
+### `r plot.model` &nbsp;&nbsp; summary:
+`r descriptions[plot.model]`
+
+##  {.tabset}
+
+### summary table
+```{r, echo = F}
+## summary table
+model.names<-colnames(plot.dat)
+model.modes<-apply(plot.dat, 2, catch.map_estimate)
+model.mean<-round(apply(plot.dat,2,mean), 3)
+n.eff<-round(effectiveSize(plot.mcmc), 0)
+hdi<-apply(plot.dat,2,FUN = ci,method = "HDI")
+
+lower<-round(c(unlist(lapply(hdi,function(x) x$CI_low))), 2)
+upper<-round(c(unlist(lapply(hdi,function(x) x$CI_high))),2)
+
+bayes.p<-apply(plot.mcmc,2,catch.p_map)
+
+
+
+
+ 
+summary.table<-tibble(param = model.names, 
+                      n_effective = n.eff, 
+                      mean = model.mean, 
+                      mode = model.modes, 
+                      hdi_89pct_lower = lower, 
+                      hdi_89pct_upper = upper, 
+                      bayes_P = bayes.p
+                      )
+
+kable(summary.table) %>%
+  kable_styling(bootstrap_options = "striped", full_width = F, position = "left")
+```
+
+
+
+
+
+
+### `r in.param<-model.names[[1]]; in.param`
+
+
+
+```{r, echo=F}
+#in.param<-model.names[[1]]
+gg.temp<-plot.gg %>% 
+  filter(Parameter == in.param)
+#ggs_traceplot(gg.temp)
+p1<-ggs_traceplot(gg.temp)
+p2<-ggs_density(gg.temp)
+p3<-ggs_autocorrelation(gg.temp)
+grid.arrange(p1, p2, p3,layout_matrix = rbind(c(1, 1),
+                        c(3,4)))
+```
+
+### `r in.param<-model.names[[2]]; in.param`
+
+
+
+```{r, echo=F}
+#in.param<-model.names[[2]]
+gg.temp<-plot.gg %>% 
+  filter(Parameter == in.param)
+#ggs_traceplot(gg.temp)
+p1<-ggs_traceplot(gg.temp)
+p2<-ggs_density(gg.temp)
+p3<-ggs_autocorrelation(gg.temp)
+grid.arrange(p1, p2, p3,layout_matrix = rbind(c(1, 1),
+                        c(3,4)))
+```
+
+
+### `r in.param<-model.names[[3]]; in.param`
+
+
+
+```{r, echo=F}
+#in.param<-model.names[[3]]
+gg.temp<-plot.gg %>% 
+  filter(Parameter == in.param)
+#ggs_traceplot(gg.temp)
+p1<-ggs_traceplot(gg.temp)
+p2<-ggs_density(gg.temp)
+p3<-ggs_autocorrelation(gg.temp)
+grid.arrange(p1, p2, p3,layout_matrix = rbind(c(1, 1),
+                        c(3,4)))
+```
+
+### `r in.param<-model.names[[4]]; in.param`
+
+
+
+```{r, echo=F}
+#in.param<-model.names[[4]]
+gg.temp<-plot.gg %>% 
+  filter(Parameter == in.param)
+#ggs_traceplot(gg.temp)
+p1<-ggs_traceplot(gg.temp)
+p2<-ggs_density(gg.temp)
+p3<-ggs_autocorrelation(gg.temp)
+grid.arrange(p1, p2, p3,layout_matrix = rbind(c(1, 1),
+                        c(3,4)))
+```
+
+# {-}
+
+
+</div>
+<br><br><br><br><br>
+<div>
+
+```{r, include = F}
+#############################################################################################################################
+## model sc.fm2
+plot.model<-models[[2]]
+plot.dat<-model.results[[plot.model]]$samples[,c('N', 'D', 'sigma', 'beta0.lam0', 'beta.lam0[1]') ]
+plot.mcmc<-as.mcmc(plot.dat)
+plot.gg<-ggs(plot.mcmc)
+
+```
+
+
+
+### `r plot.model` &nbsp;&nbsp; summary:
+`r descriptions[plot.model]`
+
+##  {.tabset}
+
+### summary table
+```{r, echo = F}
+## summary table
+model.names<-colnames(plot.dat)
+model.modes<-apply(plot.dat, 2, catch.map_estimate)
+model.mean<-round(apply(plot.dat,2,mean), 3)
+n.eff<-round(effectiveSize(plot.mcmc), 0)
+hdi<-apply(plot.dat,2,FUN = ci,method = "HDI")
+
+lower<-round(c(unlist(lapply(hdi,function(x) x$CI_low))), 2)
+upper<-round(c(unlist(lapply(hdi,function(x) x$CI_high))),2)
+
+bayes.p<-apply(plot.mcmc,2,catch.p_map)
+
+
+ 
+summary.table<-tibble(param = model.names, 
+                      n_effective = n.eff, 
+                      mean = model.mean, 
+                      mode = model.modes, 
+                      hdi_89pct_lower = lower, 
+                      hdi_89pct_upper = upper, 
+                      bayes_P = bayes.p
+                      )
+kable(summary.table) %>%
+  kable_styling(bootstrap_options = "striped", full_width = F, position = "left")
+```
+
+
+
+
+### `r in.param<-model.names[[1]]; in.param`
+
+```{r, echo=F}
+#in.param<-model.names[[1]]
+gg.temp<-plot.gg %>% 
+  filter(Parameter == in.param)
+#ggs_traceplot(gg.temp)
+p1<-ggs_traceplot(gg.temp)
+p2<-ggs_density(gg.temp)
+p3<-ggs_autocorrelation(gg.temp)
+grid.arrange(p1, p2, p3,layout_matrix = rbind(c(1, 1),
+                        c(3,4)))
+```
+
+### `r in.param<-model.names[[2]]; in.param`
+
+```{r, echo=F}
+#in.param<-model.names[[2]]
+gg.temp<-plot.gg %>% 
+  filter(Parameter == in.param)
+#ggs_traceplot(gg.temp)
+p1<-ggs_traceplot(gg.temp)
+p2<-ggs_density(gg.temp)
+p3<-ggs_autocorrelation(gg.temp)
+grid.arrange(p1, p2, p3,layout_matrix = rbind(c(1, 1),
+                        c(3,4)))
+```
+
+
+### `r in.param<-model.names[[3]]; in.param`
+
+```{r, echo=F}
+#in.param<-model.names[[3]]
+gg.temp<-plot.gg %>% 
+  filter(Parameter == in.param)
+#ggs_traceplot(gg.temp)
+p1<-ggs_traceplot(gg.temp)
+p2<-ggs_density(gg.temp)
+p3<-ggs_autocorrelation(gg.temp)
+grid.arrange(p1, p2, p3,layout_matrix = rbind(c(1, 1),
+                        c(3,4)))
+```
+
+### `r in.param<-model.names[[4]]; in.param`
+
+```{r, echo=F}
+#in.param<-model.names[[4]]
+gg.temp<-plot.gg %>% 
+  filter(Parameter == in.param)
+#ggs_traceplot(gg.temp)
+p1<-ggs_traceplot(gg.temp)
+p2<-ggs_density(gg.temp)
+p3<-ggs_autocorrelation(gg.temp)
+grid.arrange(p1, p2, p3,layout_matrix = rbind(c(1, 1),
+                        c(3,4)))
+```
+
+### `r in.param<-model.names[[5]]; in.param`
+
+```{r, echo=F}
+#in.param<-model.names[[4]]
+gg.temp<-plot.gg %>% 
+  filter(Parameter == in.param)
+#ggs_traceplot(gg.temp)
+p1<-ggs_traceplot(gg.temp)
+p2<-ggs_density(gg.temp)
+p3<-ggs_autocorrelation(gg.temp)
+grid.arrange(p1, p2, p3,layout_matrix = rbind(c(1, 1),
+                        c(3,4)))
+```
+
+# {-}
+
+
+</div>
+<br><br><br><br><br>
+<div>
+
+```{r, include = F}
+#############################################################################################################################
+## model sc.fm2.1
+plot.model<-models[[3]]
+plot.dat<-model.results[[plot.model]]$samples[,c('N', 'D', 'sigma', 'beta0.lam0', 'beta.lam0[1]') ]
+plot.mcmc<-as.mcmc(plot.dat)
+plot.gg<-ggs(plot.mcmc)
+
+```
+
+
+
+### `r plot.model` &nbsp;&nbsp; summary:
+`r descriptions[plot.model]`
+
+##  {.tabset}
+
+### summary table
+```{r, echo = F}
+## summary table
+model.names<-colnames(plot.dat)
+model.modes<-apply(plot.dat, 2, catch.map_estimate)
+model.mean<-round(apply(plot.dat,2,mean), 3)
+n.eff<-round(effectiveSize(plot.mcmc), 0)
+hdi<-apply(plot.dat,2,FUN = ci,method = "HDI")
+
+lower<-round(c(unlist(lapply(hdi,function(x) x$CI_low))), 2)
+upper<-round(c(unlist(lapply(hdi,function(x) x$CI_high))),2)
+
+bayes.p<-apply(plot.mcmc,2,catch.p_map)
+
+
+ 
+summary.table<-tibble(param = model.names, 
+                      n_effective = n.eff, 
+                      mean = model.mean, 
+                      mode = model.modes, 
+                      hdi_89pct_lower = lower, 
+                      hdi_89pct_upper = upper, 
+                      bayes_P = bayes.p
+                      )
+kable(summary.table) %>%
+  kable_styling(bootstrap_options = "striped", full_width = F, position = "left")
+```
+
+
+### `r in.param<-model.names[[1]]; in.param`
+
+
+
+```{r, echo=F}
+#in.param<-model.names[[1]]
+gg.temp<-plot.gg %>% 
+  filter(Parameter == in.param)
+#ggs_traceplot(gg.temp)
+p1<-ggs_traceplot(gg.temp)
+p2<-ggs_density(gg.temp)
+p3<-ggs_autocorrelation(gg.temp)
+grid.arrange(p1, p2, p3,layout_matrix = rbind(c(1, 1),
+                        c(3,4)))
+```
+
+### `r in.param<-model.names[[2]]; in.param`
+
+
+
+```{r, echo=F}
+#in.param<-model.names[[2]]
+gg.temp<-plot.gg %>% 
+  filter(Parameter == in.param)
+#ggs_traceplot(gg.temp)
+p1<-ggs_traceplot(gg.temp)
+p2<-ggs_density(gg.temp)
+p3<-ggs_autocorrelation(gg.temp)
+grid.arrange(p1, p2, p3,layout_matrix = rbind(c(1, 1),
+                        c(3,4)))
+```
+
+
+### `r in.param<-model.names[[3]]; in.param`
+
+
+
+```{r, echo=F}
+#in.param<-model.names[[3]]
+gg.temp<-plot.gg %>% 
+  filter(Parameter == in.param)
+#ggs_traceplot(gg.temp)
+p1<-ggs_traceplot(gg.temp)
+p2<-ggs_density(gg.temp)
+p3<-ggs_autocorrelation(gg.temp)
+grid.arrange(p1, p2, p3,layout_matrix = rbind(c(1, 1),
+                        c(3,4)))
+```
+
+### `r in.param<-model.names[[4]]; in.param`
+
+
+
+```{r, echo=F}
+#in.param<-model.names[[4]]
+gg.temp<-plot.gg %>% 
+  filter(Parameter == in.param)
+#ggs_traceplot(gg.temp)
+p1<-ggs_traceplot(gg.temp)
+p2<-ggs_density(gg.temp)
+p3<-ggs_autocorrelation(gg.temp)
+grid.arrange(p1, p2, p3,layout_matrix = rbind(c(1, 1),
+                        c(3,4)))
+```
+
+### `r in.param<-model.names[[5]]; in.param`
+
+
+
+```{r, echo=F}
+#in.param<-model.names[[4]]
+gg.temp<-plot.gg %>% 
+  filter(Parameter == in.param)
+#ggs_traceplot(gg.temp)
+p1<-ggs_traceplot(gg.temp)
+p2<-ggs_density(gg.temp)
+p3<-ggs_autocorrelation(gg.temp)
+grid.arrange(p1, p2, p3,layout_matrix = rbind(c(1, 1),
+                        c(3,4)))
+```
+
+# {-}
+
+
+</div>
+<br><br><br><br><br>
+<div>
+
+```{r, include = F}
+#############################################################################################################################
+## model sc.fm2.2
+plot.model<-models[[4]]
+plot.dat<-model.results[[plot.model]]$samples[,c('N', 'D', 'sigma', 'beta0.lam0', 'beta.lam0[1]') ]
+plot.mcmc<-as.mcmc(plot.dat)
+plot.gg<-ggs(plot.mcmc)
+
+```
+
+
+
+### `r plot.model` &nbsp;&nbsp; summary:
+`r descriptions[plot.model]`
+
+##  {.tabset}
+
+### summary table
+```{r, echo = F}
+## summary table
+model.names<-colnames(plot.dat)
+model.modes<-apply(plot.dat, 2, catch.map_estimate)
+model.mean<-round(apply(plot.dat,2,mean), 3)
+n.eff<-round(effectiveSize(plot.mcmc), 0)
+hdi<-apply(plot.dat,2,FUN = ci,method = "HDI")
+
+lower<-round(c(unlist(lapply(hdi,function(x) x$CI_low))), 2)
+upper<-round(c(unlist(lapply(hdi,function(x) x$CI_high))),2)
+
+bayes.p<-apply(plot.mcmc,2,catch.p_map)
+
+
+ 
+summary.table<-tibble(param = model.names, 
+                      n_effective = n.eff, 
+                      mean = model.mean, 
+                      mode = model.modes, 
+                      hdi_89pct_lower = lower, 
+                      hdi_89pct_upper = upper, 
+                      bayes_P = bayes.p
+                      )
+
+kable(summary.table) %>%
+  kable_styling(bootstrap_options = "striped", full_width = F, position = "left")
+```
+
+
+
+
+### `r in.param<-model.names[[1]]; in.param`
+
+
+
+```{r, echo=F}
+#in.param<-model.names[[1]]
+gg.temp<-plot.gg %>% 
+  filter(Parameter == in.param)
+#ggs_traceplot(gg.temp)
+p1<-ggs_traceplot(gg.temp)
+p2<-ggs_density(gg.temp)
+p3<-ggs_autocorrelation(gg.temp)
+grid.arrange(p1, p2, p3,layout_matrix = rbind(c(1, 1),
+                        c(3,4)))
+```
+
+### `r in.param<-model.names[[2]]; in.param`
+
+
+
+```{r, echo=F}
+#in.param<-model.names[[2]]
+gg.temp<-plot.gg %>% 
+  filter(Parameter == in.param)
+#ggs_traceplot(gg.temp)
+p1<-ggs_traceplot(gg.temp)
+p2<-ggs_density(gg.temp)
+p3<-ggs_autocorrelation(gg.temp)
+grid.arrange(p1, p2, p3,layout_matrix = rbind(c(1, 1),
+                        c(3,4)))
+```
+
+
+### `r in.param<-model.names[[3]]; in.param`
+
+
+
+```{r, echo=F}
+#in.param<-model.names[[3]]
+gg.temp<-plot.gg %>% 
+  filter(Parameter == in.param)
+#ggs_traceplot(gg.temp)
+p1<-ggs_traceplot(gg.temp)
+p2<-ggs_density(gg.temp)
+p3<-ggs_autocorrelation(gg.temp)
+grid.arrange(p1, p2, p3,layout_matrix = rbind(c(1, 1),
+                        c(3,4)))
+```
+
+### `r in.param<-model.names[[4]]; in.param`
+
+
+
+```{r, echo=F}
+#in.param<-model.names[[4]]
+gg.temp<-plot.gg %>% 
+  filter(Parameter == in.param)
+#ggs_traceplot(gg.temp)
+p1<-ggs_traceplot(gg.temp)
+p2<-ggs_density(gg.temp)
+p3<-ggs_autocorrelation(gg.temp)
+grid.arrange(p1, p2, p3,layout_matrix = rbind(c(1, 1),
+                        c(3,4)))
+```
+
+### `r in.param<-model.names[[5]]; in.param`
+
+
+
+```{r, echo=F}
+#in.param<-model.names[[4]]
+gg.temp<-plot.gg %>% 
+  filter(Parameter == in.param)
+#ggs_traceplot(gg.temp)
+p1<-ggs_traceplot(gg.temp)
+p2<-ggs_density(gg.temp)
+p3<-ggs_autocorrelation(gg.temp)
+grid.arrange(p1, p2, p3,layout_matrix = rbind(c(1, 1),
+                        c(3,4)))
+```
+
+# {-}
+
+
+
+
+</div>
+<br><br><br><br><br>
+<div>
+
+```{r, include = F}
+#############################################################################################################################
+## model sc.fm3
+plot.model<-models[[5]]
+plot.dat<-model.results[[plot.model]]$samples[,c('N', 'D', 'sigma', 'beta0.lam0', 'beta.lam0[1]',  'beta.lam0[2]') ]
+plot.mcmc<-as.mcmc(plot.dat)
+plot.gg<-ggs(plot.mcmc)
+
+```
+
+
+
+### `r plot.model` &nbsp;&nbsp; summary:
+`r descriptions[plot.model]`
+
+##  {.tabset}
+
+### summary table
+```{r, echo = F}
+## summary table
+model.names<-colnames(plot.dat)
+model.modes<-apply(plot.dat, 2, catch.map_estimate)
+model.mean<-round(apply(plot.dat,2,mean), 3)
+n.eff<-round(effectiveSize(plot.mcmc), 0)
+hdi<-apply(plot.dat,2,FUN = ci,method = "HDI")
+
+lower<-round(c(unlist(lapply(hdi,function(x) x$CI_low))), 2)
+upper<-round(c(unlist(lapply(hdi,function(x) x$CI_high))),2)
+
+bayes.p<-apply(plot.mcmc,2,catch.p_map)
+
+
+ 
+summary.table<-tibble(param = model.names, 
+                      n_effective = n.eff, 
+                      mean = model.mean, 
+                      mode = model.modes, 
+                      hdi_89pct_lower = lower, 
+                      hdi_89pct_upper = upper, 
+                      bayes_P = bayes.p
+                      )
+
+kable(summary.table) %>%
+  kable_styling(bootstrap_options = "striped", full_width = F, position = "left")
+```
+
+
+
+### `r in.param<-model.names[[1]]; in.param`
+
+
+
+```{r, echo=F}
+#in.param<-model.names[[1]]
+gg.temp<-plot.gg %>% 
+  filter(Parameter == in.param)
+#ggs_traceplot(gg.temp)
+p1<-ggs_traceplot(gg.temp)
+p2<-ggs_density(gg.temp)
+p3<-ggs_autocorrelation(gg.temp)
+grid.arrange(p1, p2, p3,layout_matrix = rbind(c(1, 1),
+                        c(3,4)))
+```
+
+### `r in.param<-model.names[[2]]; in.param`
+
+
+
+```{r, echo=F}
+#in.param<-model.names[[2]]
+gg.temp<-plot.gg %>% 
+  filter(Parameter == in.param)
+#ggs_traceplot(gg.temp)
+p1<-ggs_traceplot(gg.temp)
+p2<-ggs_density(gg.temp)
+p3<-ggs_autocorrelation(gg.temp)
+grid.arrange(p1, p2, p3,layout_matrix = rbind(c(1, 1),
+                        c(3,4)))
+```
+
+
+### `r in.param<-model.names[[3]]; in.param`
+
+
+
+```{r, echo=F}
+#in.param<-model.names[[3]]
+gg.temp<-plot.gg %>% 
+  filter(Parameter == in.param)
+#ggs_traceplot(gg.temp)
+p1<-ggs_traceplot(gg.temp)
+p2<-ggs_density(gg.temp)
+p3<-ggs_autocorrelation(gg.temp)
+grid.arrange(p1, p2, p3,layout_matrix = rbind(c(1, 1),
+                        c(3,4)))
+```
+
+### `r in.param<-model.names[[4]]; in.param`
+
+
+
+```{r, echo=F}
+#in.param<-model.names[[4]]
+gg.temp<-plot.gg %>% 
+  filter(Parameter == in.param)
+#ggs_traceplot(gg.temp)
+p1<-ggs_traceplot(gg.temp)
+p2<-ggs_density(gg.temp)
+p3<-ggs_autocorrelation(gg.temp)
+grid.arrange(p1, p2, p3,layout_matrix = rbind(c(1, 1),
+                        c(3,4)))
+```
+
+### `r in.param<-model.names[[5]]; in.param`
+
+
+
+```{r, echo=F}
+#in.param<-model.names[[4]]
+gg.temp<-plot.gg %>% 
+  filter(Parameter == in.param)
+#ggs_traceplot(gg.temp)
+p1<-ggs_traceplot(gg.temp)
+p2<-ggs_density(gg.temp)
+p3<-ggs_autocorrelation(gg.temp)
+grid.arrange(p1, p2, p3,layout_matrix = rbind(c(1, 1),
+                        c(3,4)))
+```
+
+### `r in.param<-model.names[[6]]; in.param`
+
+
+
+```{r, echo=F}
+#in.param<-model.names[[4]]
+gg.temp<-plot.gg %>% 
+  filter(Parameter == in.param)
+#ggs_traceplot(gg.temp)
+p1<-ggs_traceplot(gg.temp)
+p2<-ggs_density(gg.temp)
+p3<-ggs_autocorrelation(gg.temp)
+grid.arrange(p1, p2, p3,layout_matrix = rbind(c(1, 1),
+                        c(3,4)))
+```
+
+# {-}
+
+
+</div>
+<br><br><br><br><br>
+<div>
+
+```{r, include = F}
+#############################################################################################################################
+## model sc.fm4
+plot.model<-models[[6]]
+plot.dat<-model.results[[plot.model]]$samples[,c('N', 'D', 'sigma', 'beta0.lam0', 'beta.lam0[1]',  'beta.lam0[2]',  'beta.lam0[3]') ]
+plot.mcmc<-as.mcmc(plot.dat)
+plot.gg<-ggs(plot.mcmc)
+
+```
+
+
+
+### `r plot.model` &nbsp;&nbsp; summary:
+`r descriptions[plot.model]`
+
+##  {.tabset}
+
+### summary table
+```{r, echo = F}
+## summary table
+model.names<-colnames(plot.dat)
+model.modes<-apply(plot.dat, 2, catch.map_estimate)
+model.mean<-round(apply(plot.dat,2,mean), 3)
+n.eff<-round(effectiveSize(plot.mcmc), 0)
+hdi<-apply(plot.dat,2,FUN = ci,method = "HDI")
+
+lower<-round(c(unlist(lapply(hdi,function(x) x$CI_low))), 2)
+upper<-round(c(unlist(lapply(hdi,function(x) x$CI_high))),2)
+
+bayes.p<-apply(plot.mcmc,2,catch.p_map)
+
+
+ 
+summary.table<-tibble(param = model.names, 
+                      n_effective = n.eff, 
+                      mean = model.mean, 
+                      mode = model.modes, 
+                      hdi_89pct_lower = lower, 
+                      hdi_89pct_upper = upper, 
+                      bayes_P = bayes.p
+                      )
+
+kable(summary.table) %>%
+  kable_styling(bootstrap_options = "striped", full_width = F, position = "left")
+```
+
+
+
+### `r in.param<-model.names[[1]]; in.param`
+
+
+
+```{r, echo=F}
+#in.param<-model.names[[1]]
+gg.temp<-plot.gg %>% 
+  filter(Parameter == in.param)
+#ggs_traceplot(gg.temp)
+p1<-ggs_traceplot(gg.temp)
+p2<-ggs_density(gg.temp)
+p3<-ggs_autocorrelation(gg.temp)
+grid.arrange(p1, p2, p3,layout_matrix = rbind(c(1, 1),
+                        c(3,4)))
+```
+
+### `r in.param<-model.names[[2]]; in.param`
+
+
+
+```{r, echo=F}
+#in.param<-model.names[[2]]
+gg.temp<-plot.gg %>% 
+  filter(Parameter == in.param)
+#ggs_traceplot(gg.temp)
+p1<-ggs_traceplot(gg.temp)
+p2<-ggs_density(gg.temp)
+p3<-ggs_autocorrelation(gg.temp)
+grid.arrange(p1, p2, p3,layout_matrix = rbind(c(1, 1),
+                        c(3,4)))
+```
+
+
+### `r in.param<-model.names[[3]]; in.param`
+
+
+
+```{r, echo=F}
+#in.param<-model.names[[3]]
+gg.temp<-plot.gg %>% 
+  filter(Parameter == in.param)
+#ggs_traceplot(gg.temp)
+p1<-ggs_traceplot(gg.temp)
+p2<-ggs_density(gg.temp)
+p3<-ggs_autocorrelation(gg.temp)
+grid.arrange(p1, p2, p3,layout_matrix = rbind(c(1, 1),
+                        c(3,4)))
+```
+
+### `r in.param<-model.names[[4]]; in.param`
+
+
+
+```{r, echo=F}
+#in.param<-model.names[[4]]
+gg.temp<-plot.gg %>% 
+  filter(Parameter == in.param)
+#ggs_traceplot(gg.temp)
+p1<-ggs_traceplot(gg.temp)
+p2<-ggs_density(gg.temp)
+p3<-ggs_autocorrelation(gg.temp)
+grid.arrange(p1, p2, p3,layout_matrix = rbind(c(1, 1),
+                        c(3,4)))
+```
+
+### `r in.param<-model.names[[5]]; in.param`
+
+
+
+```{r, echo=F}
+#in.param<-model.names[[4]]
+gg.temp<-plot.gg %>% 
+  filter(Parameter == in.param)
+#ggs_traceplot(gg.temp)
+p1<-ggs_traceplot(gg.temp)
+p2<-ggs_density(gg.temp)
+p3<-ggs_autocorrelation(gg.temp)
+grid.arrange(p1, p2, p3,layout_matrix = rbind(c(1, 1),
+                        c(3,4)))
+```
+
+### `r in.param<-model.names[[6]]; in.param`
+
+
+
+```{r, echo=F}
+#in.param<-model.names[[4]]
+gg.temp<-plot.gg %>% 
+  filter(Parameter == in.param)
+#ggs_traceplot(gg.temp)
+p1<-ggs_traceplot(gg.temp)
+p2<-ggs_density(gg.temp)
+p3<-ggs_autocorrelation(gg.temp)
+grid.arrange(p1, p2, p3,layout_matrix = rbind(c(1, 1),
+                        c(3,4)))
+```
+
+### `r in.param<-model.names[[7]]; in.param`
+
+
+
+```{r, echo=F}
+#in.param<-model.names[[4]]
+gg.temp<-plot.gg %>% 
+  filter(Parameter == in.param)
+#ggs_traceplot(gg.temp)
+p1<-ggs_traceplot(gg.temp)
+p2<-ggs_density(gg.temp)
+p3<-ggs_autocorrelation(gg.temp)
+grid.arrange(p1, p2, p3,layout_matrix = rbind(c(1, 1),
+                        c(3,4)))
+```
+
+# {-}
+
+</div>
+<br><br><br><br><br>
+<div>
+
+```{r, include = F}
+#############################################################################################################################
+## model sc.fm5
+plot.model<-models[[7]]
+plot.dat<-model.results[[plot.model]]$samples[,c('N', 'D', 'sigma', 'beta0.lam0', 'beta.lam0[1]',  'beta.lam0[2]','beta.lam0[3]', 'beta.lam0[4]') ]
+plot.mcmc<-as.mcmc(plot.dat)
+plot.gg<-ggs(plot.mcmc)
+
+```
+
+
+
+### `r plot.model` &nbsp;&nbsp; summary:
+`r descriptions[plot.model]`
+
+##  {.tabset}
+
+### summary table
+```{r, echo = F}
+## summary table
+model.names<-colnames(plot.dat)
+model.modes<-apply(plot.dat, 2, catch.map_estimate)
+model.mean<-round(apply(plot.dat,2,mean), 3)
+n.eff<-round(effectiveSize(plot.mcmc), 0)
+hdi<-apply(plot.dat,2,FUN = ci,method = "HDI")
+
+lower<-round(c(unlist(lapply(hdi,function(x) x$CI_low))), 2)
+upper<-round(c(unlist(lapply(hdi,function(x) x$CI_high))),2)
+
+bayes.p<-apply(plot.mcmc,2,catch.p_map)
+
+
+ 
+summary.table<-tibble(param = model.names, 
+                      n_effective = n.eff, 
+                      mean = model.mean, 
+                      mode = model.modes, 
+                      hdi_89pct_lower = lower, 
+                      hdi_89pct_upper = upper, 
+                      bayes_P = bayes.p
+                      )
+
+kable(summary.table) %>%
+  kable_styling(bootstrap_options = "striped", full_width = F, position = "left")
+```
+
+
+
+### `r in.param<-model.names[[1]]; in.param`
+
+
+
+```{r, echo=F}
+#in.param<-model.names[[1]]
+gg.temp<-plot.gg %>% 
+  filter(Parameter == in.param)
+#ggs_traceplot(gg.temp)
+p1<-ggs_traceplot(gg.temp)
+p2<-ggs_density(gg.temp)
+p3<-ggs_autocorrelation(gg.temp)
+grid.arrange(p1, p2, p3,layout_matrix = rbind(c(1, 1),
+                        c(3,4)))
+```
+
+### `r in.param<-model.names[[2]]; in.param`
+
+
+
+```{r, echo=F}
+#in.param<-model.names[[2]]
+gg.temp<-plot.gg %>% 
+  filter(Parameter == in.param)
+#ggs_traceplot(gg.temp)
+p1<-ggs_traceplot(gg.temp)
+p2<-ggs_density(gg.temp)
+p3<-ggs_autocorrelation(gg.temp)
+grid.arrange(p1, p2, p3,layout_matrix = rbind(c(1, 1),
+                        c(3,4)))
+```
+
+
+### `r in.param<-model.names[[3]]; in.param`
+
+
+
+```{r, echo=F}
+#in.param<-model.names[[3]]
+gg.temp<-plot.gg %>% 
+  filter(Parameter == in.param)
+#ggs_traceplot(gg.temp)
+p1<-ggs_traceplot(gg.temp)
+p2<-ggs_density(gg.temp)
+p3<-ggs_autocorrelation(gg.temp)
+grid.arrange(p1, p2, p3,layout_matrix = rbind(c(1, 1),
+                        c(3,4)))
+```
+
+### `r in.param<-model.names[[4]]; in.param`
+
+
+
+```{r, echo=F}
+#in.param<-model.names[[4]]
+gg.temp<-plot.gg %>% 
+  filter(Parameter == in.param)
+#ggs_traceplot(gg.temp)
+p1<-ggs_traceplot(gg.temp)
+p2<-ggs_density(gg.temp)
+p3<-ggs_autocorrelation(gg.temp)
+grid.arrange(p1, p2, p3,layout_matrix = rbind(c(1, 1),
+                        c(3,4)))
+```
+
+### `r in.param<-model.names[[5]]; in.param`
+
+
+
+```{r, echo=F}
+#in.param<-model.names[[4]]
+gg.temp<-plot.gg %>% 
+  filter(Parameter == in.param)
+#ggs_traceplot(gg.temp)
+p1<-ggs_traceplot(gg.temp)
+p2<-ggs_density(gg.temp)
+p3<-ggs_autocorrelation(gg.temp)
+grid.arrange(p1, p2, p3,layout_matrix = rbind(c(1, 1),
+                        c(3,4)))
+```
+
+### `r in.param<-model.names[[6]]; in.param`
+
+
+
+```{r, echo=F}
+#in.param<-model.names[[4]]
+gg.temp<-plot.gg %>% 
+  filter(Parameter == in.param)
+#ggs_traceplot(gg.temp)
+p1<-ggs_traceplot(gg.temp)
+p2<-ggs_density(gg.temp)
+p3<-ggs_autocorrelation(gg.temp)
+grid.arrange(p1, p2, p3,layout_matrix = rbind(c(1, 1),
+                        c(3,4)))
+```
+
+### `r in.param<-model.names[[7]]; in.param`
+
+
+
+```{r, echo=F}
+#in.param<-model.names[[4]]
+gg.temp<-plot.gg %>% 
+  filter(Parameter == in.param)
+#ggs_traceplot(gg.temp)
+p1<-ggs_traceplot(gg.temp)
+p2<-ggs_density(gg.temp)
+p3<-ggs_autocorrelation(gg.temp)
+grid.arrange(p1, p2, p3,layout_matrix = rbind(c(1, 1),
+                        c(3,4)))
+```
+
+### `r in.param<-model.names[[8]]; in.param`
+
+
+
+```{r, echo=F}
+#in.param<-model.names[[4]]
+gg.temp<-plot.gg %>% 
+  filter(Parameter == in.param)
+#ggs_traceplot(gg.temp)
+p1<-ggs_traceplot(gg.temp)
+p2<-ggs_density(gg.temp)
+p3<-ggs_autocorrelation(gg.temp)
+grid.arrange(p1, p2, p3,layout_matrix = rbind(c(1, 1),
+                        c(3,4)))
+```
+
+# {-}
+
+
+</div>

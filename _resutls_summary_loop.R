@@ -12,11 +12,14 @@ rm(params)
 #data.year<-'2018'
 render.file<-"C:/Hatfield/scripts/R/Projects/Meso/occupancy/OccEstimatesbyYear/rmarkdown/SC_results/model_results_summary_14mods_lureInt_passes.Rmd"
 #out.file.path<-"./2017_results_SC/"
-out.file.path<-"C:/Hatfield/scripts/R/Projects/Meso/occupancy/OccEstimatesbyYear/rmarkdown/SC_results/2018_results_SC/20200505_14models_350000iter_passes"
+# out.file.path<-"C:/Hatfield/scripts/R/Projects/Meso/occupancy/OccEstimatesbyYear/rmarkdown/SC_results/2018_results_SC/20200505_14models_350000iter_passes"
+out.file.path<-"C:/Hatfield/scripts/R/Projects/Meso/occupancy/SC_Results_toGit/SC_model_2017"
+
 #meta.in<-'C:/Hatfield/scripts/R/Projects/Meso/occupancy/OccEstimatesbyYear/data/out/SC_results_files_2018/metadata/SC_model_meta_2018.Rdata'
 # readRDS(meta.in)
-files.loop<-list.files('C:/Hatfield/scripts/R/Projects/Meso/occupancy/OccEstimatesbyYear/data/out/SC_output/fm_models_out/2018', 
+files.loop<-list.files('C:/Hatfield/scripts/R/Projects/Meso/occupancy/OccEstimatesbyYear/data/out/SC_output/fm_models_out/2017', 
                        full.names = T)
+files.loop<-files.loop[grepl('Bobcat',files.loop) | grepl('LongTail',files.loop)]
 
 # loop.species<-readRDS(meta.in)
 # loop.species<-names(loop.species$all.y.long)

@@ -1,5 +1,5 @@
 ---
-title: "2017_results"
+title: ""
 output: 
   html_document
 ---

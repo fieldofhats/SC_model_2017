@@ -19,8 +19,6 @@ navbar:
     href: LongTailedWeasel2017.html
   - text: "WhiteTailedJackrabbit"
     href: WhiteTailedJackrabbit2017.html
-  - text: "ResultsSummary"
-    href: ResultsSummary.html
 output:
   html_document:
     theme: cosmo

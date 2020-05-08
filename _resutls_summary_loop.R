@@ -19,7 +19,7 @@ out.file.path<-"C:/Hatfield/scripts/R/Projects/Meso/occupancy/SC_Results_toGit/S
 # readRDS(meta.in)
 files.loop<-list.files('C:/Hatfield/scripts/R/Projects/Meso/occupancy/OccEstimatesbyYear/data/out/SC_output/fm_models_out/2017', 
                        full.names = T)
-files.loop<-files.loop[grepl('Bobcat',files.loop) | grepl('LongTail',files.loop)]
+files.loop<-files.loop[grepl('White',files.loop)]
 
 # loop.species<-readRDS(meta.in)
 # loop.species<-names(loop.species$all.y.long)
